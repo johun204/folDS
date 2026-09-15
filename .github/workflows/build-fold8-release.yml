@@ -22,6 +22,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # 기본값 "tools platform-tools"의 'tools'는 cmdline-tools 16에서 사라져 실패함
+          packages: 'platform-tools'
 
       - name: Update SDK tools, accept licenses, install NDK + CMake
         run: |
