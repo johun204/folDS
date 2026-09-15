@@ -92,7 +92,10 @@ class UILayoutProvider(private val defaultLayoutProvider: DefaultLayoutProvider)
 
         return if (requiresDefaultLayout) {
             val defaultLayout = defaultLayoutProvider.buildDefaultLayout(variant)
-            val mainScreenLayout = if (mainScreenRequiresDefaultLayout) {
+            val mainScreenLayout = if (mainScreenRequiresDefaultLayout && layout.mainScreenLayout.backgroundId == null) {
+                // folDS: 사용자 배경이 없으면 기본 레이아웃의 DS 스킨 배경까지 함께 사용
+                defaultLayout.mainScreenLayout
+            } else if (mainScreenRequiresDefaultLayout) {
                 layout.mainScreenLayout.copy(components = defaultLayout.mainScreenLayout.components)
             } else {
                 layout.mainScreenLayout

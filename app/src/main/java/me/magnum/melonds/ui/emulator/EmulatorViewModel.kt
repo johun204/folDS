@@ -70,6 +70,9 @@ import me.magnum.melonds.domain.repositories.SaveStatesRepository
 import me.magnum.melonds.domain.repositories.SettingsRepository
 import me.magnum.melonds.domain.services.EmulatorManager
 import me.magnum.melonds.impl.emulator.EmulatorSession
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import me.magnum.melonds.impl.layout.DsSkin
 import me.magnum.melonds.impl.layout.UILayoutProvider
 import me.magnum.melonds.ui.emulator.component.RetroAchievementsSubmissionHandler
 import me.magnum.melonds.ui.emulator.firmware.FirmwarePauseMenuOption
@@ -100,6 +103,7 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class EmulatorViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val settingsRepository: SettingsRepository,
     private val romsRepository: RomsRepository,
     private val cheatsRepository: CheatsRepository,
@@ -797,7 +801,7 @@ class EmulatorViewModel @Inject constructor(
         return if (backgroundId == null) {
             RuntimeBackground(null, mode)
         } else {
-            val background = backgroundsRepository.getBackground(backgroundId)
+            val background = DsSkin.background(backgroundId, context.packageName) ?: backgroundsRepository.getBackground(backgroundId)
             RuntimeBackground(background, mode)
         }
     }

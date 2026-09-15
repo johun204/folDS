@@ -16,6 +16,8 @@ import me.magnum.melonds.ui.emulator.input.FrontendInputHandler
 import me.magnum.melonds.ui.emulator.input.IInputListener
 import me.magnum.melonds.ui.emulator.input.SingleButtonInputHandler
 import me.magnum.melonds.ui.emulator.input.TouchscreenInputHandler
+import me.magnum.melonds.impl.layout.DsSkin
+import me.magnum.melonds.ui.emulator.input.view.SkinButtonView
 import me.magnum.melonds.ui.emulator.input.view.ToggleableImageView
 import me.magnum.melonds.ui.emulator.model.ConnectedControllersState
 import me.magnum.melonds.ui.emulator.model.RuntimeInputLayoutConfiguration
@@ -72,6 +74,11 @@ class RuntimeLayoutView(context: Context, attrs: AttributeSet? = null) : LayoutV
 
     fun instantiateLayout(runtimeLayout: RuntimeInputLayoutConfiguration, layoutTarget: LayoutTarget) {
         currentRuntimeLayout = runtimeLayout
+        val screenLayout = when (layoutTarget) {
+            LayoutTarget.MAIN_SCREEN -> runtimeLayout.layout.mainScreenLayout
+            LayoutTarget.SECONDARY_SCREEN -> runtimeLayout.layout.secondaryScreenLayout
+        }
+        (viewBuilderFactory as? RuntimeLayoutComponentViewBuilderFactory)?.useDsSkin = DsSkin.isSkin(screenLayout.backgroundId)
         instantiateLayout(runtimeLayout.layout, layoutTarget)
         updateInputs()
         updateVisibility()
@@ -90,12 +97,14 @@ class RuntimeLayoutView(context: Context, attrs: AttributeSet? = null) : LayoutV
 
         val enableHapticFeedback = currentRuntimeLayout.isHapticFeedbackEnabled
         systemInputHandler?.let {
-            getLayoutComponentView(LayoutComponent.DPAD)?.view?.setOnTouchListener(DpadInputHandler(it, enableHapticFeedback, touchVibrator))
-            getLayoutComponentView(LayoutComponent.BUTTONS)?.view?.setOnTouchListener(ButtonsInputHandler(it, enableHapticFeedback, touchVibrator))
-            getLayoutComponentView(LayoutComponent.BUTTON_L)?.view?.setOnTouchListener(SingleButtonInputHandler(it, Input.L, enableHapticFeedback, touchVibrator))
-            getLayoutComponentView(LayoutComponent.BUTTON_R)?.view?.setOnTouchListener(SingleButtonInputHandler(it, Input.R, enableHapticFeedback, touchVibrator))
-            getLayoutComponentView(LayoutComponent.BUTTON_SELECT)?.view?.setOnTouchListener(SingleButtonInputHandler(it, Input.SELECT, enableHapticFeedback, touchVibrator))
-            getLayoutComponentView(LayoutComponent.BUTTON_START)?.view?.setOnTouchListener(SingleButtonInputHandler(it, Input.START, enableHapticFeedback, touchVibrator))
+            // folDS: 스킨 버튼이면 리스너를 감싸 눌림 효과를 표시
+            val listenerFor = { component: LayoutComponent -> (getLayoutComponentView(component)?.view as? SkinButtonView)?.wrap(it) ?: it }
+            getLayoutComponentView(LayoutComponent.DPAD)?.view?.setOnTouchListener(DpadInputHandler(listenerFor(LayoutComponent.DPAD), enableHapticFeedback, touchVibrator))
+            getLayoutComponentView(LayoutComponent.BUTTONS)?.view?.setOnTouchListener(ButtonsInputHandler(listenerFor(LayoutComponent.BUTTONS), enableHapticFeedback, touchVibrator))
+            getLayoutComponentView(LayoutComponent.BUTTON_L)?.view?.setOnTouchListener(SingleButtonInputHandler(listenerFor(LayoutComponent.BUTTON_L), Input.L, enableHapticFeedback, touchVibrator))
+            getLayoutComponentView(LayoutComponent.BUTTON_R)?.view?.setOnTouchListener(SingleButtonInputHandler(listenerFor(LayoutComponent.BUTTON_R), Input.R, enableHapticFeedback, touchVibrator))
+            getLayoutComponentView(LayoutComponent.BUTTON_SELECT)?.view?.setOnTouchListener(SingleButtonInputHandler(listenerFor(LayoutComponent.BUTTON_SELECT), Input.SELECT, enableHapticFeedback, touchVibrator))
+            getLayoutComponentView(LayoutComponent.BUTTON_START)?.view?.setOnTouchListener(SingleButtonInputHandler(listenerFor(LayoutComponent.BUTTON_START), Input.START, enableHapticFeedback, touchVibrator))
             getLayoutComponentView(LayoutComponent.BUTTON_HINGE)?.view?.setOnTouchListener(SingleButtonInputHandler(it, Input.HINGE, enableHapticFeedback, touchVibrator))
         }
         frontendInputHandler?.let {
@@ -113,7 +122,7 @@ class RuntimeLayoutView(context: Context, attrs: AttributeSet? = null) : LayoutV
         getLayoutComponentViews().forEach {
             if (!it.component.isScreen()) {
                 it.view.apply {
-                    alpha = inputAlpha
+                    alpha = if (this is SkinButtonView) 1f else inputAlpha
                 }
             }
         }
