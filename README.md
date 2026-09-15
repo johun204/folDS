@@ -1,62 +1,27 @@
-# melonDS Android port
-Android port of [melonDS](https://melonds.kuribo64.net/), a DS and DSi emulator.
+# folDS
 
-[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80">](https://play.google.com/store/apps/details?id=me.magnum.melonds&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)[<img src="https://raw.githubusercontent.com/Kunzisoft/Github-badge/main/get-it-on-github.png" alt="Get it on GitHub" height="80">](https://github.com/rafaelvcaetano/melonDS-android/releases/latest)
+갤럭시 폴드용으로 커스터마이즈한 개인용 닌텐도 DS 에뮬레이터.
+[rafaelvcaetano/melonDS-android](https://github.com/rafaelvcaetano/melonDS-android)의 포크이며, 에뮬레이션 코어는 [melonDS](https://melonds.kuribo64.net/)입니다.
 
-|Rom List|Dark Theme|Pocket Physics|Layout Editor|
-|---|---|---|---|
-|![Screenshot 1](./.github/images/screenshot_mobile0.png)|![Screenshot 2](./.github/images/screenshot_mobile1.png)|![Screenshot 3](./.github/images/screenshot_mobile2.png)|![Screenshot 4](./.github/images/screenshot_mobile3.png)|
+## 폴드 전용으로 바꾼 것
 
-# Missing Features
-*  Local Multiplayer
-*  DSi SD card support
-*  Customizable button skins
-*  More display filters
+- **펼침(내부 화면)**: 화면 전체에 실제 DS Lite 모양 스킨을 깔고, 스킨 속 두 화면 위치에 게임을 렌더링합니다. 스킨 위의 십자키·X/Y/A/B·START/SELECT를 누르면 실제 입력이 들어가고 눌린 부분이 어두워집니다.
+- **접힘(커버 화면)**: 같은 컨셉을 세로로 재구성해, 좁고 긴 화면에서도 게임 화면이 작아지지 않도록 두 화면을 거의 전체 폭으로 배치합니다.
+- 자동 퀵세이브(설정 > Save Files), 백그라운드·접힘 시 저장
+- 시작 시 ROM 캐시 정리, 자세별 화면 회전 고정
 
-# Performance
-Performance is solid on 64 bit devices with thread rendering and JIT enabled, and should run at full speed on flagship devices. Performance on older devices, specially
-32 bit devices, is very poor due to the lack of JIT support.
+스킨 좌표는 `app/src/main/java/me/magnum/melonds/impl/layout/DsSkin.kt`에 스킨 PNG(`app/src/main/res/drawable-nodpi/`) 픽셀 기준으로 들어 있습니다. 스킨 이미지를 바꾸면 좌표도 함께 고쳐야 합니다.
 
-# Integration with third-party frontends
-It's possible to launch melonDS from third part frontends. For that, you will need to have the ROMs you want to launch already scanned by melonDS. Then, you can configure your
-third-party frontend with the following configuration:
-*  Package name: `me.magnum.melonds`
-*  Activity name: `me.magnum.melonds.ui.emulator.EmulatorActivity`
-*  Parameters (choose one):
-    * Intent data (preferred) - a URI of the NDS ROM (ZIP and 7z files are supported). Ensure [read permission is granted](https://developer.android.com/reference/android/content/Intent#FLAG_GRANT_READ_URI_PERMISSION)
-    * `uri` (deprecated) - a string with the [SAF](https://developer.android.com/guide/topics/providers/create-document-provider) URI of the NDS ROM (ZIP and 7z files are supported)
-    * `PATH` (deprecated) - a string with the absolute path to the NDS ROM (ZIP and 7z files are supported)
+## 빌드
 
-### Pegasus metadata files
-* [melonds.metadata.txt](./.github/pegasus/melonds.metadata.txt) 
-* [melonds-nightly.metadata.txt](./.github/pegasus/melonds-nightly.metadata.txt) 
+로컬에 JDK 21 / NDK / SDK가 없어 GitHub Actions로 빌드합니다.
 
-### Info regarding save files
-When launching ROMs from third-party frontends, if melonDS hasn't scanned that particular ROM previously, it won't be able to create the save file next to the ROM file if the
-option "Save next to ROM file" is enabled in the settings or the save file directory is not set. Instead, melonDS will create a save file in
-`Android/data/me.magnum.melonds/files/saves`
+```
+gh workflow run build-fold8-release.yml --ref main
+```
 
-# Nightly Builds
+APK는 워크플로 아티팩트와 Releases에 올라갑니다. CI가 매번 새 서명 키를 만들기 때문에 기존 설치본 위에 덮어 설치되지 않습니다(재설치 필요).
 
-To have access to the latest changes, you can install nightly builds that you can find [here](https://github.com/rafaelvcaetano/melonDS-android/releases/tag/nightly-release).
+## 라이선스
 
-Be aware that these builds can contain more bugs than usual and you may need to clear your app data to get it to work properly after updates.
-
-# Building
-To build the project you will need Android SDK, NDK and CMake.
-
-## Build steps:
-1.  Clone the project, including submodules with:
-    
-    `git clone --recurse-submodules https://github.com/rafaelvcaetano/melonDS-android.git`
-2.  Install the Android SDK, NDK and CMake
-3.  Build with:
-    1.  Unix: `./gradlew :app:assembleGitHubProdDebug`
-    2.  Windows: `gradlew.bat :app:assembleGitHubProdDebug`
-4.  The generated APK can be found at `app/gitHubProd/debug`
-
-If you want to create a release build, you will need to modify your `local.properties` file to include the following fields:  
-*  `MELONDS_KEYSTORE=<path_to_your_keystore>`
-*  `MELONDS_KEYSTORE_PASSWORD=<keystore_password>`
-*  `MELONDS_KEY_ALIAS=<name_of_your_key_alias>`
-*  `MELONDS_KEY_PASSWORD=<key_alias_password>`
+원본과 동일하게 GPLv3입니다. [LICENSE](LICENSE) 참고.
