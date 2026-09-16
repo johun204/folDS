@@ -357,7 +357,7 @@ class EmulatorViewModel @Inject constructor(
         sessionCoroutineScope.launch {
             emulatorManager.pauseEmulator()
             if (showPauseMenu) {
-                val pauseOptions = when (_emulatorState.value) {
+                val baseOptions: List<PauseMenuOption>? = when (_emulatorState.value) {
                     is EmulatorState.RunningRom -> {
                         RomPauseMenuOption.entries.filter {
                             filterRomPauseMenuOption(it)
@@ -368,6 +368,8 @@ class EmulatorViewModel @Inject constructor(
                     }
                     else -> null
                 }
+                // folDS: 화면에서 뺀 보조 버튼 기능을 초기화/종료(항상 마지막 2개) 바로 앞에 넣는다
+                val pauseOptions = baseOptions?.let { it.dropLast(2) + FoldsPauseMenuOption.entries + it.takeLast(2) }
 
                 if (pauseOptions != null) {
                     _uiEvent.emit(EmulatorUiEvent.ShowPauseMenu(PauseMenu(pauseOptions)))

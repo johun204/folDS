@@ -84,6 +84,7 @@ import me.magnum.melonds.ui.emulator.input.EmulatorRumbleManager
 import me.magnum.melonds.ui.emulator.input.FrontendInputHandler
 import me.magnum.melonds.ui.emulator.input.INativeInputListener
 import me.magnum.melonds.ui.emulator.input.InputProcessor
+import me.magnum.melonds.domain.model.Input
 import me.magnum.melonds.ui.emulator.input.MelonTouchHandler
 import me.magnum.melonds.ui.emulator.model.EmulatorOverlay
 import me.magnum.melonds.ui.emulator.model.EmulatorState
@@ -873,7 +874,15 @@ class EmulatorActivity : AppCompatActivity() {
                 .setTitle(R.string.pause)
                 .setItems(options) { _, which ->
                     val selectedOption = pauseMenu.options[which]
-                    viewModel.onPauseMenuOptionSelected(selectedOption)
+                    if (selectedOption is FoldsPauseMenuOption) {
+                        // folDS: 숨긴 보조 버튼과 같은 입력을 보내고 게임 재개
+                        val handler = if (selectedOption.input == Input.HINGE) melonTouchHandler else frontendInputHandler
+                        handler.onKeyPress(selectedOption.input)
+                        handler.onKeyReleased(selectedOption.input)
+                        viewModel.resumeEmulator()
+                    } else {
+                        viewModel.onPauseMenuOptionSelected(selectedOption)
+                    }
                 }
                 .setOnDismissListener {
                     activeOverlays.removeActiveOverlay(EmulatorOverlay.PAUSE_MENU)

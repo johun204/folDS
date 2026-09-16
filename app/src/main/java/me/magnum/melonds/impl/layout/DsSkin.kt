@@ -33,11 +33,6 @@ object DsSkin {
             LayoutComponent.BUTTON_SELECT to Rect(913, 948, 68, 68),
             LayoutComponent.BUTTON_L to Rect(28, 395, 170, 70),
             LayoutComponent.BUTTON_R to Rect(968, 395, 170, 70),
-            LayoutComponent.BUTTON_HINGE to Rect(30, 125, 60, 60),
-            LayoutComponent.BUTTON_TOGGLE_SOFT_INPUT to Rect(105, 125, 60, 60),
-            LayoutComponent.BUTTON_MICROPHONE_TOGGLE to Rect(180, 125, 60, 60),
-            LayoutComponent.BUTTON_FAST_FORWARD_TOGGLE to Rect(1001, 125, 60, 60),
-            LayoutComponent.BUTTON_SWAP_SCREENS to Rect(1076, 125, 60, 60),
         ),
     )
 
@@ -53,9 +48,6 @@ object DsSkin {
             LayoutComponent.BUTTON_SELECT to Rect(401, 2165, 116, 116),
             LayoutComponent.BUTTON_L to Rect(40, 1790, 220, 90),
             LayoutComponent.BUTTON_R to Rect(820, 1790, 220, 90),
-            LayoutComponent.BUTTON_HINGE to Rect(400, 1800, 70, 70),
-            LayoutComponent.BUTTON_TOGGLE_SOFT_INPUT to Rect(505, 1800, 70, 70),
-            LayoutComponent.BUTTON_FAST_FORWARD_TOGGLE to Rect(610, 1800, 70, 70),
         ),
     )
 
